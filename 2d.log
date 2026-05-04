@@ -1,0 +1,13 @@
+franke      d=2  P= 20  relRMSE=2.180e-01  succ=0/8  (9.4s)
+franke      d=3  P= 48  relRMSE=1.687e-01  succ=0/8  (18.0s)
+franke      d=4  P=104  relRMSE=9.520e-02  succ=0/8  (37.3s)
+sincos      d=2  P= 20  relRMSE=6.255e-01  succ=0/8  (9.2s)
+sincos      d=3  P= 48  relRMSE=1.909e-01  succ=0/8  (19.3s)
+sincos      d=4  P=104  relRMSE=5.447e-02  succ=0/8  (38.0s)
+saddle      d=2  P= 20  relRMSE=1.617e-01  succ=0/8  (8.8s)
+saddle      d=3  P= 48  relRMSE=6.180e-02  succ=0/8  (17.6s)
+saddle      d=4  P=104  relRMSE=1.257e-02  succ=2/8  (37.4s)
+rosenbrock  d=2  P= 20  relRMSE=3.631e-01  succ=0/8  (9.4s)
+rosenbrock  d=3  P= 48  relRMSE=1.144e-01  succ=0/8  (19.1s)
+rosenbrock  d=4  P=104  relRMSE=4.787e-02  succ=1/8  (37.8s)
+total: 261.5s

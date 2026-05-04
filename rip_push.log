@@ -1,0 +1,9 @@
+rip R   d=3  P= 34  rel=9.502e-02  runs=36  (48.8s)
+rip CC  d=3  P= 68  rel=7.008e-02  runs=18  (48.4s)
+rip R   d=4  P= 74  rel=1.104e-02  runs=19  (50.3s)
+rip CC  d=4  P=148  rel=5.608e-02  runs=9  (48.2s)
+rip R   d=5  P=154  rel=2.183e-02  runs=10  (52.7s)
+rip CC  d=5  P=308  rel=4.435e-02  runs=5  (54.2s)
+rip R   d=6  P=314  rel=5.811e-03  runs=5  (53.5s)
+rip CC  d=6  P=628  rel=4.550e-02  runs=3  (66.7s)
+total: 422.7s

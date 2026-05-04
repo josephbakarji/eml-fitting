@@ -1,0 +1,110 @@
+[
+  {
+    "target": "franke",
+    "depth": 2,
+    "n_params": 20,
+    "relRMSE": 0.21797694737546552,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 9.43136715888977
+  },
+  {
+    "target": "franke",
+    "depth": 3,
+    "n_params": 48,
+    "relRMSE": 0.16870855351451927,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 18.00102186203003
+  },
+  {
+    "target": "franke",
+    "depth": 4,
+    "n_params": 104,
+    "relRMSE": 0.09519552482383277,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 37.30065989494324
+  },
+  {
+    "target": "sincos",
+    "depth": 2,
+    "n_params": 20,
+    "relRMSE": 0.6254969050044263,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 9.22871708869934
+  },
+  {
+    "target": "sincos",
+    "depth": 3,
+    "n_params": 48,
+    "relRMSE": 0.19092775032637752,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 19.339870929718018
+  },
+  {
+    "target": "sincos",
+    "depth": 4,
+    "n_params": 104,
+    "relRMSE": 0.05447301125679429,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 37.98165798187256
+  },
+  {
+    "target": "saddle",
+    "depth": 2,
+    "n_params": 20,
+    "relRMSE": 0.16169759254432947,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 8.827911138534546
+  },
+  {
+    "target": "saddle",
+    "depth": 3,
+    "n_params": 48,
+    "relRMSE": 0.06179926877065063,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 17.581622838974
+  },
+  {
+    "target": "saddle",
+    "depth": 4,
+    "n_params": 104,
+    "relRMSE": 0.012565418631417934,
+    "success": 2,
+    "n_restarts": 8,
+    "time_s": 37.41557312011719
+  },
+  {
+    "target": "rosenbrock",
+    "depth": 2,
+    "n_params": 20,
+    "relRMSE": 0.3631064429783641,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 9.406053066253662
+  },
+  {
+    "target": "rosenbrock",
+    "depth": 3,
+    "n_params": 48,
+    "relRMSE": 0.11439050172055568,
+    "success": 0,
+    "n_restarts": 8,
+    "time_s": 19.118824005126953
+  },
+  {
+    "target": "rosenbrock",
+    "depth": 4,
+    "n_params": 104,
+    "relRMSE": 0.04787201925465304,
+    "success": 1,
+    "n_restarts": 8,
+    "time_s": 37.826122999191284
+  }
+]

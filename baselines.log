@@ -1,0 +1,19 @@
+sin      tiny   P= 14  eml=5.54e-02  poly=1.07e-09  mlp=9.62e-03  rbf=4.08e-02
+sin      small  P= 34  eml=2.78e-02  poly=7.47e-01  mlp=5.58e-03  rbf=1.15e-02
+sin      medium P= 74  eml=1.23e-02  poly=9.86e-01  mlp=1.37e-03  rbf=5.36e-03
+x2       tiny   P= 14  eml=1.32e-02  poly=1.48e-16  mlp=4.16e-02  rbf=5.35e-02
+x2       small  P= 34  eml=4.77e-03  poly=5.42e-09  mlp=2.71e-02  rbf=8.03e-03
+x2       medium P= 74  eml=1.45e-03  poly=5.71e-01  mlp=1.13e-02  rbf=8.53e-03
+abs      tiny   P= 14  eml=2.96e-02  poly=1.61e-02  mlp=5.20e-02  rbf=7.03e-02
+abs      small  P= 34  eml=2.00e-02  poly=6.36e-03  mlp=1.49e-02  rbf=5.05e-02
+abs      medium P= 74  eml=1.32e-02  poly=7.15e-01  mlp=1.11e-02  rbf=1.39e-02
+gauss    tiny   P= 14  eml=9.52e-02  poly=7.70e-04  mlp=4.42e-03  rbf=5.98e-03
+gauss    small  P= 34  eml=1.24e-02  poly=1.22e-01  mlp=3.05e-03  rbf=5.45e-03
+gauss    medium P= 74  eml=1.66e-02  poly=1.00e+00  mlp=2.57e-03  rbf=3.22e-03
+tanh     tiny   P= 14  eml=2.69e-02  poly=2.98e-03  mlp=2.73e-03  rbf=2.75e-02
+tanh     small  P= 34  eml=1.53e-02  poly=5.64e-05  mlp=4.95e-03  rbf=2.82e-03
+tanh     medium P= 74  eml=7.02e-03  poly=8.36e-01  mlp=9.20e-04  rbf=4.89e-03
+rip      tiny   P= 14  eml=6.89e-01  poly=7.69e-02  mlp=1.20e-01  rbf=4.93e-02
+rip      small  P= 34  eml=2.29e-01  poly=9.87e-01  mlp=5.79e-02  rbf=7.63e-03
+rip      medium P= 74  eml=7.49e-02  poly=1.00e+00  mlp=7.12e-03  rbf=1.38e-03
+elapsed: 514.9s

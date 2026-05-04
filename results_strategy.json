@@ -1,0 +1,202 @@
+[
+  {
+    "target": "sin",
+    "strategy": "A_restart",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 30.426235914230347,
+    "n_runs": 11,
+    "best_loss": 0.0001431040541749682,
+    "best_relRMSE": 0.016955841380555444
+  },
+  {
+    "target": "sin",
+    "strategy": "B_lbfgs",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 21.771466970443726,
+    "n_runs": 11,
+    "best_loss": 1.0049556369485745e-05,
+    "best_relRMSE": 0.004493314546057018
+  },
+  {
+    "target": "sin",
+    "strategy": "C_curric",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 33.001073122024536,
+    "n_runs": 35,
+    "best_loss": 0.000155277836965349,
+    "best_relRMSE": 0.017662334794386957
+  },
+  {
+    "target": "sin",
+    "strategy": "D_symwarm",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 31.45845603942871,
+    "n_runs": 12,
+    "best_loss": 2.9289319127153184e-05,
+    "best_relRMSE": 0.007670929905923574
+  },
+  {
+    "target": "x2",
+    "strategy": "A_restart",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 31.26956605911255,
+    "n_runs": 12,
+    "best_loss": 1.3659462600166106e-05,
+    "best_relRMSE": 0.0020455310444942236
+  },
+  {
+    "target": "x2",
+    "strategy": "B_lbfgs",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 21.633422136306763,
+    "n_runs": 11,
+    "best_loss": 1.5533741415949626e-06,
+    "best_relRMSE": 0.0006898065344179353
+  },
+  {
+    "target": "x2",
+    "strategy": "C_curric",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 32.41283297538757,
+    "n_runs": 35,
+    "best_loss": 5.786247691210999e-05,
+    "best_relRMSE": 0.004210055088638071
+  },
+  {
+    "target": "x2",
+    "strategy": "D_symwarm",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 30.622473001480103,
+    "n_runs": 12,
+    "best_loss": 2.497573661672443e-05,
+    "best_relRMSE": 0.0027659760880680943
+  },
+  {
+    "target": "gauss",
+    "strategy": "A_restart",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 30.371668100357056,
+    "n_runs": 12,
+    "best_loss": 9.628640450838052e-05,
+    "best_relRMSE": 0.019648350029475438
+  },
+  {
+    "target": "gauss",
+    "strategy": "B_lbfgs",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 21.99080204963684,
+    "n_runs": 11,
+    "best_loss": 2.5751475821795288e-06,
+    "best_relRMSE": 0.003213251088098572
+  },
+  {
+    "target": "gauss",
+    "strategy": "C_curric",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 31.653537034988403,
+    "n_runs": 34,
+    "best_loss": 1.4024922058571295e-05,
+    "best_relRMSE": 0.0074988355516052785
+  },
+  {
+    "target": "gauss",
+    "strategy": "D_symwarm",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 30.91335391998291,
+    "n_runs": 12,
+    "best_loss": 5.501860600972704e-05,
+    "best_relRMSE": 0.014852460046440192
+  },
+  {
+    "target": "tanh",
+    "strategy": "A_restart",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 30.47739005088806,
+    "n_runs": 12,
+    "best_loss": 4.973154015476156e-06,
+    "best_relRMSE": 0.002572630447725906
+  },
+  {
+    "target": "tanh",
+    "strategy": "B_lbfgs",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 22.796604871749878,
+    "n_runs": 12,
+    "best_loss": 3.6026943072519314e-06,
+    "best_relRMSE": 0.0021896522982428326
+  },
+  {
+    "target": "tanh",
+    "strategy": "C_curric",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 32.18895483016968,
+    "n_runs": 36,
+    "best_loss": 0.0004490855558356023,
+    "best_relRMSE": 0.02444702373162005
+  },
+  {
+    "target": "tanh",
+    "strategy": "D_symwarm",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 30.326324939727783,
+    "n_runs": 12,
+    "best_loss": 0.0001541010282866539,
+    "best_relRMSE": 0.014320699079867903
+  },
+  {
+    "target": "rip",
+    "strategy": "A_restart",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 30.888250827789307,
+    "n_runs": 12,
+    "best_loss": 0.001450689732302485,
+    "best_relRMSE": 0.0993589053049501
+  },
+  {
+    "target": "rip",
+    "strategy": "B_lbfgs",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 21.931663751602173,
+    "n_runs": 11,
+    "best_loss": 5.4754951017094866e-05,
+    "best_relRMSE": 0.019303285177014382
+  },
+  {
+    "target": "rip",
+    "strategy": "C_curric",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 32.51861310005188,
+    "n_runs": 34,
+    "best_loss": 0.0011522213361923335,
+    "best_relRMSE": 0.08854977986555022
+  },
+  {
+    "target": "rip",
+    "strategy": "D_symwarm",
+    "depth": 4,
+    "budget_s": 30.0,
+    "elapsed_s": 30.501281023025513,
+    "n_runs": 12,
+    "best_loss": 0.0027835385865383633,
+    "best_relRMSE": 0.13763159801055835
+  }
+]
