@@ -1,9 +1,13 @@
 """Visualize EMLTree fits for representative 1D targets and write PNGs."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import torch, numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from eml_tree import EMLTree, fit_multistart
+from src.eml_tree import EMLTree, fit_multistart
 
 torch.set_default_dtype(torch.float64)
 
@@ -32,7 +36,7 @@ def main():
         ax.set_title(name); ax.legend(fontsize=8); ax.grid(alpha=0.3)
     plt.suptitle("EMLTree depth=4 fits (best of 12 restarts)")
     plt.tight_layout()
-    plt.savefig("fits_1d.png", dpi=130, bbox_inches='tight')
+    plt.savefig("figures/fits_1d.png", dpi=130, bbox_inches='tight')
     print("wrote fits_1d.png")
 
 

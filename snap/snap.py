@@ -12,7 +12,7 @@ from __future__ import annotations
 import copy
 import torch
 import torch.nn as nn
-from eml_tree import EMLTree, fit
+from src.eml_tree import EMLTree, fit
 
 
 def _slot_keys(model: EMLTree):

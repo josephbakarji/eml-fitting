@@ -12,9 +12,13 @@ Compare three schedules at strategy B, 25 s/cell:
   S2  : λ: 0 -> 1e-1 cosine ramp (the suggested anneal)
   S3  : λ: 0 -> 1.0  cosine ramp (aggressive)
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
-from eml_tree_complex import CEMLTree, fit_complex, lbfgs_refine_complex
+from src.eml_tree_complex import CEMLTree, fit_complex, lbfgs_refine_complex
 
 torch.set_default_dtype(torch.float64)
 
@@ -94,7 +98,7 @@ def main():
                 print(f"{name:10s} {sname:18s} d={d}  rel={rel:.3e}  "
                       f"runs={runs:3d}  im={im_str}  ({elapsed:.1f}s)")
     print(f"total: {time.time()-grand_t0:.1f}s")
-    with open("results_complex_anneal.json", "w") as f:
+    with open("results/results_complex_anneal.json", "w") as f:
         json.dump(out, f, indent=2)
 
 

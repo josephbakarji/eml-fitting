@@ -1,11 +1,15 @@
 """Plot R vs CR vs CC across targets and depths."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-with open("results_complex_params.json") as f:
+with open("results/results_complex_params.json") as f:
     data = json.load(f)
 
 targets = sorted({r["target"] for r in data})
@@ -42,5 +46,5 @@ fig.legend(handles=handles, loc="lower right", bbox_to_anchor=(0.99, 0.05),
            fontsize=9)
 fig.suptitle("Backend × parameterisation comparison (best relRMSE, strategy B, 25 s/cell)")
 plt.tight_layout(rect=[0, 0.03, 1, 0.96])
-plt.savefig("fits_complex_params.png", dpi=130, bbox_inches="tight")
+plt.savefig("figures/fits_complex_params.png", dpi=130, bbox_inches="tight")
 print("wrote fits_complex_params.png")

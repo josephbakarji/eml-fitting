@@ -44,53 +44,49 @@ target functions to small error in practice?
 
 ## Repository layout
 
-### Modules
-- `eml_tree.py` — `EMLTree`, the affine-glue architecture (EM)
-- `eml_tree_complex.py` — `CEMLTree`, complex-parameter variant of EM
-  (twin (real, imag) Parameters, complex128 forward, λ_im annealing
-  schedule)
-- `eml_tree_parametric.py` — `ParametricEMLTree` (PEM), per-node 6-param
-  formulation, eml-all-the-way-down
-
-### Snap-to-symbol post-processing
-- `snap.py` — three snap modes for EM (pure, coefficient, greedy + refit)
-- `snap_parametric.py` — per-parameter greedy snap for PEM with discrete
-  candidate sets `{0, ±1}` per parameter; expression decoder
-
-### Experiments
-- `exp_1d.py` — 1D depth scaling, 11 targets × depths 1–4
-- `exp_2d.py` — bivariate fits (Franke, sincos, saddle, Rosenbrock)
-- `exp_baselines.py` — vs. polynomial / MLP-tanh / RBF baselines
-- `exp_landscape.py` — 50-seed landscape diagnostic
-- `exp_snap.py` — three EM snap modes on 7 targets
-- `exp_strategy.py` — A: random restart vs. B: Adam+LBFGS vs.
-  C: curriculum vs. D: symbolic warm-start
-- `exp_universality.py` — depth 2–6 sweep with strategy B (headline)
-- `exp_complex.py` — `real_softplus` vs `complex_real` backend, real
-  parameters
-- `exp_complex_params.py` — R / CR / CC: real-soft + real, complex-real
-  + real, complex-real + complex
-- `exp_complex_anneal.py` — λ_im schedule sweep on CC
-- `exp_rip_push.py` — rip target at d=3..6 with 60 s budget
-- `exp_parametric.py` — PEM vs EM, 11 targets × 4 depths
-- `exp_parametric_snap.py` — PEM snap at d=3
-
-### Plots
-- `make_plots.py`, `make_depth_plot.py`, `make_complex_plot.py`,
-  `make_anneal_plot.py`, `make_pem_plot.py`
-
-### Outputs
-- `results_*.json` — per-experiment full breakdowns (per-run, per-cell)
-- `*.png` — generated figures
-- `EXPERIMENTS.md` — chronological experiment log with timing and
-  headline result per run
-
-### Documents
-- `paper/main.tex` — full experimental write-up (22 pages)
-- `paper/main.pdf` — compiled PDF
-- `REPORT.md` — short prose summary of the early findings
-- `WEAKNESSES.md` — self-audit of architectural, optimisation, and
-  generalisation weaknesses
+```
+eml-fitting/
+├── src/                         # tree modules (importable as src.X)
+│   ├── eml_tree.py              # EMLTree (affine-glue, EM)
+│   ├── eml_tree_complex.py      # CEMLTree (complex parameters, λ_im anneal)
+│   └── eml_tree_parametric.py   # ParametricEMLTree (PEM, eml-all-the-way-down)
+├── snap/                        # snap-to-symbol post-processing
+│   ├── snap.py                  # 3 snap modes for EM (pure / coef / greedy)
+│   └── snap_parametric.py       # per-parameter greedy snap for PEM
+├── experiments/                 # 13 numbered experiments
+│   ├── exp_1d.py                #  1. 1D depth scaling, 11 targets × depths 1–4
+│   ├── exp_2d.py                #  2. Bivariate (Franke, sincos, saddle, Rosenbrock)
+│   ├── exp_baselines.py         #  3. vs. polynomial / MLP-tanh / RBF
+│   ├── exp_landscape.py         #  4. 50-seed basin diagnostic
+│   ├── exp_snap.py              #  5. EM snap modes on 7 targets
+│   ├── exp_strategy.py          #  6. A: restart vs B: Adam+LBFGS vs C: curric vs D: sym-warm
+│   ├── exp_universality.py      #  7. depth 2–6 sweep, strategy B (headline)
+│   ├── exp_complex.py           #  8. real_softplus vs complex_real backend, real params
+│   ├── exp_complex_params.py    #  9. R / CR / CC three-way comparison
+│   ├── exp_complex_anneal.py    # 10. λ_im schedule sweep on CC
+│   ├── exp_rip_push.py          # 11. rip target at d=3..6, 60 s budget
+│   ├── exp_parametric.py        # 12. PEM vs EM, 11 targets × 4 depths
+│   └── exp_parametric_snap.py   # 13. PEM snap at d=3
+├── scripts/                     # plot generators
+│   ├── make_plots.py            # fits_1d.png
+│   ├── make_depth_plot.py       # fits_depth.png (universality figure)
+│   ├── make_complex_plot.py     # fits_complex_params.png
+│   ├── make_anneal_plot.py      # fits_anneal.png
+│   └── make_pem_plot.py         # fits_pem.png
+├── results/                     # per-experiment JSON outputs (per-run breakdowns)
+├── figures/                     # generated PNGs
+├── logs/                        # captured stdout from each run
+├── paper/                       # LaTeX writeup (22 pages, compiled)
+│   ├── main.tex
+│   └── main.pdf
+├── docs/                        # supplementary prose
+│   ├── REPORT.md                # early prose summary
+│   └── WEAKNESSES.md            # self-audit
+├── EXPERIMENTS.md               # chronological experiment log
+├── _setup.py                    # path bootstrap (used by all scripts)
+├── README.md
+└── LICENSE
+```
 
 ## Running the experiments
 
@@ -103,9 +99,12 @@ matplotlib
 
 To reproduce a single experiment:
 ```
-python3 exp_universality.py     # ~18 minutes single CPU
-python3 make_depth_plot.py
+python3 experiments/exp_universality.py     # ~18 minutes single CPU
+python3 scripts/make_depth_plot.py
 ```
+
+(All scripts auto-resolve paths relative to the project root via the
+top-level `_setup.py` bootstrap, so they can be invoked from anywhere.)
 
 Total compute across all experiments is ~3 hours on a single Apple-M
 CPU, no GPU.

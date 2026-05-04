@@ -1,10 +1,14 @@
 """Plot PEM vs EM across targets and depths."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-with open("results_parametric.json") as f:
+with open("results/results_parametric.json") as f:
     data = json.load(f)
 
 targets = sorted({r["target"] for r in data})
@@ -36,5 +40,5 @@ fig.legend(handles=handles, loc="lower right", bbox_to_anchor=(0.99, 0.05),
 fig.suptitle("Parametric per-node EML vs affine-glue EML "
              "(strategy B, 25 s/cell)")
 plt.tight_layout(rect=[0, 0.03, 1, 0.96])
-plt.savefig("fits_pem.png", dpi=130, bbox_inches="tight")
+plt.savefig("figures/fits_pem.png", dpi=130, bbox_inches="tight")
 print("wrote fits_pem.png")

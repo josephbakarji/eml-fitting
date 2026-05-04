@@ -13,10 +13,14 @@ Targets:
 Strategy: B (Adam + LBFGS refine), 25s budget per (target, depth).
 Compare side-by-side to real_softplus.
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
-from eml_tree import EMLTree, fit
-from exp_strategy import strategy_B  # works regardless of backend if model created right
+from src.eml_tree import EMLTree, fit
+from experiments.exp_strategy import strategy_B  # works regardless of backend if model created right
 
 torch.set_default_dtype(torch.float64)
 
@@ -94,7 +98,7 @@ def main():
                 print(f"{name:10s} {backend:14s} d={d}  rel={rel:.3e}  "
                       f"runs={runs:3d}  ({elapsed:.1f}s)")
     print(f"total: {time.time()-grand_t0:.1f}s")
-    with open("results_complex.json", "w") as f:
+    with open("results/results_complex.json", "w") as f:
         json.dump(out, f, indent=2)
 
 

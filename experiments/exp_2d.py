@@ -1,8 +1,12 @@
 """2D fitting test: bivariate targets with input dim = 2."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch
 import numpy as np
-from eml_tree import EMLTree, fit_multistart
+from src.eml_tree import EMLTree, fit_multistart
 
 torch.set_default_dtype(torch.float64)
 
@@ -66,7 +70,7 @@ def main():
                   f"relRMSE={relrmse:.3e}  succ={succ}/{N_RESTARTS}  "
                   f"({elapsed:.1f}s)")
     print(f"total: {time.time()-t0:.1f}s")
-    with open("results_2d.json", "w") as f:
+    with open("results/results_2d.json", "w") as f:
         json.dump(out, f, indent=2)
 
 

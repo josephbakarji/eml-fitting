@@ -8,11 +8,15 @@ Strategies:
 
 Budget: 30 seconds per (target, strategy).
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
 import torch.nn as nn
-from eml_tree import EMLTree, fit
-from snap import _slot_keys, _candidate_vertices
+from src.eml_tree import EMLTree, fit
+from snap.snap import _slot_keys, _candidate_vertices
 
 torch.set_default_dtype(torch.float64)
 
@@ -198,7 +202,7 @@ def main():
             print(f"{name:6s} {sname:10s} runs={runs:3d}  rel={rel:.3e}  "
                   f"({elapsed:.1f}s)")
     print(f"total: {time.time()-grand_t0:.1f}s")
-    with open("results_strategy.json", "w") as f:
+    with open("results/results_strategy.json", "w") as f:
         json.dump(out, f, indent=2)
 
 

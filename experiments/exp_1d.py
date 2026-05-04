@@ -1,8 +1,12 @@
 """1D fitting stress test for EMLTree."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch
 import numpy as np
-from eml_tree import EMLTree, fit_multistart
+from src.eml_tree import EMLTree, fit_multistart
 
 torch.set_default_dtype(torch.float64)
 
@@ -59,7 +63,7 @@ def main():
             print(f"{name:10s} d={depth} params={best_model.n_params:3d}  "
                   f"relRMSE={relrmse:.3e}  succ={success}/{N_RESTARTS}")
     print(f"elapsed: {time.time()-t0:.1f}s")
-    with open("results_1d.json", "w") as f:
+    with open("results/results_1d.json", "w") as f:
         json.dump(results, f, indent=2)
 
 

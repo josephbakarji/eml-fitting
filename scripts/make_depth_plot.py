@@ -1,11 +1,15 @@
 """Plot relRMSE vs depth for each target — the universality figure."""
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-with open("results_universality.json") as f:
+with open("results/results_universality.json") as f:
     data = json.load(f)
 
 # Group by target
@@ -35,5 +39,5 @@ ax.axhline(0.01, color="k", ls="--", lw=0.8, alpha=0.5)
 ax.text(2, 0.011, "1% relRMSE", fontsize=8, va="bottom")
 
 plt.tight_layout()
-plt.savefig("fits_depth.png", dpi=130, bbox_inches="tight")
+plt.savefig("figures/fits_depth.png", dpi=130, bbox_inches="tight")
 print("wrote fits_depth.png")

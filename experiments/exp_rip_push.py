@@ -4,10 +4,14 @@ Compare CC (complex params) at depths 3..6 with 60s budget per depth, plus
 R (real-soft, real params) for paired control. Best schedule from
 exp_complex_anneal.py is used (anneal 0 -> 1e-1).
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
-from eml_tree import EMLTree, fit
-from eml_tree_complex import CEMLTree, fit_complex, lbfgs_refine_complex
+from src.eml_tree import EMLTree, fit
+from src.eml_tree_complex import CEMLTree, fit_complex, lbfgs_refine_complex
 
 torch.set_default_dtype(torch.float64)
 
@@ -94,7 +98,7 @@ def main():
                     "best_relRMSE":rel})
         print(f"rip CC  d={d}  P={n_p:3d}  rel={rel:.3e}  runs={runs}  ({elapsed:.1f}s)")
     print(f"total: {time.time()-grand_t0:.1f}s")
-    with open("results_rip_push.json","w") as f:
+    with open("results/results_rip_push.json","w") as f:
         json.dump(out, f, indent=2)
 
 

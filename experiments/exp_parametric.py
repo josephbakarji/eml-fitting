@@ -7,10 +7,14 @@ eml-all-the-way-down — no affine wrapper between nodes.
 Compare side-by-side with EMLTree (affine-glue) on canonical 1D targets,
 strategy B (Adam multi-restart + LBFGS), 25s/cell.
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
-from eml_tree import EMLTree, fit
-from eml_tree_parametric import ParametricEMLTree, fit_parametric, lbfgs_refine_parametric
+from src.eml_tree import EMLTree, fit
+from src.eml_tree_parametric import ParametricEMLTree, fit_parametric, lbfgs_refine_parametric
 
 torch.set_default_dtype(torch.float64)
 
@@ -108,7 +112,7 @@ def main():
                         "n_runs": runs, "elapsed_s": elapsed})
             print(f"{name:10s} EM  d={d}  P={n_p:3d}  rel={rel:.3e}  runs={runs:3d}  ({elapsed:.1f}s)")
     print(f"total: {time.time()-grand_t0:.1f}s")
-    with open("results_parametric.json", "w") as f:
+    with open("results/results_parametric.json", "w") as f:
         json.dump(out, f, indent=2)
 
 

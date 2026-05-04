@@ -6,9 +6,13 @@ Questions:
 - Does multi-restart ~converge to a plateau?
 - What's the 'best of N' as N grows?
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
-from eml_tree import EMLTree, fit
+from src.eml_tree import EMLTree, fit
 
 torch.set_default_dtype(torch.float64)
 
@@ -58,7 +62,7 @@ def main():
                   f"med={row['median_relRMSE']:.2e}  "
                   f"<5%={row['frac_lt_5pct']:.0%}  <1%={row['frac_lt_1pct']:.0%}")
     print(f"total: {time.time()-t0:.1f}s")
-    with open("results_landscape.json", "w") as f:
+    with open("results/results_landscape.json", "w") as f:
         json.dump(out, f, indent=2)
 
 

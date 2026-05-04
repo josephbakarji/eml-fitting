@@ -10,10 +10,14 @@ We hold strategy = B (Adam multi-restart + LBFGS refine), 25s/cell.
 Also: report the imag-part magnitude of the trained CEMLTree, since loss
 penalises only Re(.). If Im is huge, that's a regularization signal.
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
-from eml_tree import EMLTree, fit
-from eml_tree_complex import CEMLTree, fit_complex, lbfgs_refine_complex
+from src.eml_tree import EMLTree, fit
+from src.eml_tree_complex import CEMLTree, fit_complex, lbfgs_refine_complex
 
 torch.set_default_dtype(torch.float64)
 
@@ -137,7 +141,7 @@ def main():
             print(f"{name:10s} CC  d={d}  P={n_p:3d}  rel={rel:.3e}  runs={runs:3d}  "
                   f"im_mag={im_mag:.2e}  ({elapsed:.1f}s)")
     print(f"total: {time.time()-grand_t0:.1f}s")
-    with open("results_complex_params.json", "w") as f:
+    with open("results/results_complex_params.json", "w") as f:
         json.dump(out, f, indent=2)
 
 

@@ -14,7 +14,7 @@ tol_rel of current. After all attempts, refit unsnapped params by Adam.
 from __future__ import annotations
 import copy
 import torch
-from eml_tree_parametric import ParametricEMLTree, fit_parametric
+from src.eml_tree_parametric import ParametricEMLTree, fit_parametric
 
 
 CANDIDATES = {

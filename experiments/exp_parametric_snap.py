@@ -4,10 +4,14 @@ Hypothesis: per-parameter discrete candidate sets give cleaner snap recovery
 than affine-glue's slot-vertex snap, because each parameter has interpretable
 discrete values from the operator's algebra.
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
-from eml_tree_parametric import ParametricEMLTree, fit_parametric, lbfgs_refine_parametric
-from snap_parametric import snap_greedy_parametric, decode_pem
+from src.eml_tree_parametric import ParametricEMLTree, fit_parametric, lbfgs_refine_parametric
+from snap.snap_parametric import snap_greedy_parametric, decode_pem
 
 torch.set_default_dtype(torch.float64)
 
@@ -67,7 +71,7 @@ def main():
               f"snap={n_snap}/{total} ({100*n_snap/total:.0f}%)")
         print(f"           {expr_short}")
     print(f"elapsed: {time.time()-t0:.1f}s")
-    with open("results_parametric_snap.json", "w") as f:
+    with open("results/results_parametric_snap.json", "w") as f:
         json.dump(out, f, indent=2)
 
 

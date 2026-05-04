@@ -4,10 +4,14 @@ Reports:
   loss_pre, loss_after_pure, loss_after_coef, loss_after_greedy,
   n_slots_total, n_slots_snapped_greedy, expression_post_greedy.
 """
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import _setup  # noqa: F401  (adds project root to sys.path and chdirs)
+
 import json, time
 import torch, numpy as np
-from eml_tree import EMLTree, fit_multistart
-from snap import (snap_pure_symbol, snap_coef, snap_greedy,
+from src.eml_tree import EMLTree, fit_multistart
+from snap.snap import (snap_pure_symbol, snap_coef, snap_greedy,
                   decode_expression, _slot_keys)
 
 torch.set_default_dtype(torch.float64)
@@ -70,7 +74,7 @@ def main():
               f"snap={n_snap}/{n_slots}")
         print(f"           expr: {expr_short}")
     print(f"elapsed: {time.time()-t0:.1f}s")
-    with open("results_snap.json", "w") as f:
+    with open("results/results_snap.json", "w") as f:
         json.dump(out, f, indent=2)
 
 
