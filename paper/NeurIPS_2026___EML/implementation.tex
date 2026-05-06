@@ -153,6 +153,98 @@ construction; the number of completed Adam restarts ranges from $\sim 15$
 at $(d{=}3,\,$R$)$ down to $2$ at $(d{=}5,\,$C$)$. No GPU acceleration
 or parallelism was used.
 
+\subsection{Inspection of the fitted trees: are they symbolic?}
+\label{sec:impl:inspection}
+
+The PEM atom carries the parameter-free $\operatorname{EML}$ as the corner case
+$\theta = (1, 1, 0, -1, 1, 0)$, and the constructive proof in
+Sections~\ref{sec:basicBuildingBlocks}--\ref{sec:constructingPolynomials}
+realises every elementary function as a tree whose every atom has
+$\theta_i \in \{0, \pm 1\}^6$. A natural question is whether the fitted
+trees recover this structure, or whether they exploit the continuous
+$\R^6$ freedom of each atom to find function-level fits that bear no
+relation to the symbolic blocks.
+
+\paragraph{Procedure.}
+For each of the five targets, we refit a depth-$3$ PEM ($7$ atoms,
+$42$ parameters) with $24$ Adam restarts plus an L-BFGS refinement.
+We then greedily snap each parameter to the nearest member of
+$\{-2, -1, 0, 1, 2\}$, accepting a snap if the loss does not grow by
+more than $30\%$, and refit the un-snapped parameters with the snapped
+ones held fixed. Atoms whose six parameters all snap are reported as
+\emph{fully discrete}.
+
+\paragraph{Result.} Table~\ref{tab:pem_snap} summarises. Across all five
+targets, \emph{at most $7/42$ ($17\%$) parameters are snappable, and
+zero atoms become fully discrete}. On $\tanh(2x)$ and $e^{-x^2}$ exactly
+$0$ parameters snap.
+
+\begin{table}[h]
+  \centering
+  \caption{Greedy snap of fitted depth-$3$ PEM parameters to
+  $\{-2,\,-1,\,0,\,1,\,2\}$ at $30\%$ relative-loss tolerance.}
+  \label{tab:pem_snap}
+  \small
+  \begin{tabular}{l|cccc}
+    \toprule
+    Target & relRMSE pre & relRMSE post & snapped & fully-discrete atoms \\
+    \midrule
+    $x^3 - x$              & $7.3\!\cdot\!10^{-3}$ & $6.9\!\cdot\!10^{-3}$ & $7/42$ ($17\%$) & $0$ \\
+    $\tanh(2x)$            & $3.8\!\cdot\!10^{-3}$ & $3.5\!\cdot\!10^{-3}$ & $0/42$ ($0\%$)  & $0$ \\
+    $\sin(x)$              & $1.9\!\cdot\!10^{-3}$ & $1.7\!\cdot\!10^{-3}$ & $3/42$ ($7\%$)  & $0$ \\
+    $e^{-x^2}$             & $3.9\!\cdot\!10^{-3}$ & $3.2\!\cdot\!10^{-3}$ & $0/42$ ($0\%$)  & $0$ \\
+    $\sin(3x)\,e^{-x^2/2}$ & $1.18\!\cdot\!10^{-1}$ & $7.7\!\cdot\!10^{-2}$ & $3/42$ ($7\%$)  & $0$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Example.} For $x^3 - x$ (the most snappable target), the fitted
+parameter table is
+\begin{center}
+\small
+\begin{tabular}{l|cccccc}
+\toprule
+atom $i$ & $a_i$ & $b_i$ & $c_i$ & $d_i$ & $e_i$ & $f_i$ \\
+\midrule
+root            & $1.516$ & $-0.654$ & $0.796$ & $-2.080$ & $0.652$ & $0.029$ \\
+left child      & $1.218$ & $-0.436$ & $0.147$ & $-0.755$ & $-0.034$ & $1.501$ \\
+right child     & $1.803$ & $0.473$  & $0.138$ & $-2.348$ & $0.115$ & $-0.785$ \\
+leaf-parent 1   & $1.299$ & $-1.359$ & $0.847$ & $-0.143$ & $0.127$ & $0.449$ \\
+leaf-parent 2   & $1.272$ & $-2.646$ & $0.116$ & $-0.065$ & $0.357$ & $0.841$ \\
+leaf-parent 3   & $1.267$ & $-0.072$ & $0.504$ & $-1.190$ & $0.114$ & $0.471$ \\
+leaf-parent 4   & $0.913$ & $2.388$  & $0.475$ & $-0.672$ & $-0.219$ & $1.080$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+The $a$ column clusters around $1$--$2$ but contains no exact integers; the
+$d$ column ranges over $-2.35$ to $-0.07$ with no values near the
+original-EML default $d = -1$; the $b$ column spans $-2.65$ to $2.39$ with
+no recognisable structure. The constructive proof builds $x^3 - x$ from
+$5k - 3 = 12$ atoms with $a, d \in \{0, \pm 1\}$ exactly and the
+coefficients absorbed into $c$ via $c = \log m$. The fitted $7$-atom tree
+matches the function value to $0.7\%$ but does so by additive interference
+of stacked exp/log curves with arbitrary continuous slopes, not by
+anything resembling the proof's polynomial expansion.
+
+\paragraph{Why.} A PEM atom has $\R^6$ of freedom; the symbolic
+constructions occupy a measure-zero subset. From Gaussian initialisation,
+gradient descent almost surely lands somewhere else. The
+loss landscape is shape-determined: many parameter settings produce
+indistinguishable $L^2$ values on the training grid, and the
+optimiser settles on whichever continuous-coefficient minimum its
+trajectory reaches first.
+
+\paragraph{Implication.} The §\ref{sec:impl:setup}--\ref{sec:impl:limitations}
+results support the \emph{approximation} content of the theorem: trees
+reach small error in practice. They do \emph{not} support an
+\emph{interpretability} claim about the recovered trees. Recovering
+discrete-parameter trees with the symbolic structure of
+Sections~\ref{sec:basicBuildingBlocks}--\ref{sec:constructingPolynomials}
+would require additional structural regularisation (sparsity penalty
+toward $\{0, \pm 1\}$, warm-start from the construction, or a two-stage
+train-then-snap-then-refit at tighter tolerance). We leave these for
+future work.
+
 \subsection{Limitations}
 \label{sec:impl:limitations}
 
@@ -178,16 +270,9 @@ We list the limitations of this empirical study honestly, in priority order.
   numbers are achieved errors, not bounds. They are upper-bounded by the
   theorem; whether they meet the rate the theorem predicts (and at what
   budget the gap closes) is a question we do not address here.
-\item \textbf{Function-level fits, not symbolic recoveries.} Decoding
-  the fitted depth-$3$ trees and greedy-snapping each parameter to the
-  nearest of $\{-2, -1, 0, 1, 2\}$ at $30\%$ relative-loss tolerance, we
-  recover at most $7/42$ ($17\%$) parameters as discrete on any target,
-  and zero atoms become fully discrete. On $\tanh(2x)$ and $e^{-x^2}$
-  exactly $0$ parameters are snappable. The optimiser exploits the
-  $\R^6$ freedom of each atom to land in a continuous-coefficient basin
-  whose function value matches the target but whose parameters bear no
-  resemblance to the constructive symbolic blocks of Sections~5--6.
-  Recovering interpretable trees would require a structural regulariser
-  (sparsity-toward-$\{0,\pm1\}$, or warm-start from the construction);
-  this is left for future work.
+\item \textbf{Function-level fits, not symbolic recoveries.}
+  Section~\ref{sec:impl:inspection} shows that the fitted trees are
+  continuous-coefficient approximations, not symbolic constructions
+  matching the proof's blocks. Recovering interpretable trees is open
+  (see that section).
 \end{itemize}
