@@ -27,13 +27,17 @@ The binary operator $\eml(x,y) = e^x - \ln y$, together with the constant $1$,
 generates the algebra of elementary functions \cite{odrzywolek2026}. Universality
 is constructive but says nothing about whether arbitrary target functions can
 be \emph{recovered in practice} via gradient-based optimisation of $\eml$-trees.
-We report a systematic empirical study of this question. We replace the discrete
-symbolic grammar $\{1, x, \text{child}\}$ at each tree node with a
-\emph{continuous affine} input mixing $a x + b\,\text{child} + c$, fit by
-multi-restart Adam, and study optimisation strategies, depth scaling,
-interpretability via post-hoc symbol snapping, and computational cost. The
-central practical question is whether a careful optimisation strategy can
-realise the universality theorem to small approximation error.
+We report a systematic empirical study of this question across two
+architectures: (EM) the parameter-free $\eml$ operator wrapped in continuous
+affine input-mixing layers $a x + b\,\text{child} + c$ between nodes, and
+(PEM) per-node parametric $\eml$
+$\mathrm{EML}_\theta(x, y) = a e^{bx+c} + d \ln(ey+f)$ with raw children
+fed directly between nodes (eml all the way down). We fit both with
+multi-restart Adam followed by LBFGS refinement, and study optimisation
+strategies, depth scaling, interpretability via post-hoc symbol snapping,
+and computational cost. The central practical question is whether a careful
+optimisation strategy can realise the universality theorem to small
+approximation error.
 
 \paragraph{Headline findings.}
 \begin{enumerate}
@@ -99,32 +103,79 @@ arbitrary target functions in a practically tractable budget?} A positive
 answer would constitute the first practical universal-approximation result
 based on the $\eml$ operator.
 
-\section{Continuous-affine EML trees}
+\section{Two architectures for EML-tree fitting}
 \label{sec:cae}
 
-\subsection{Architecture}
+We study two parameterisations of $\eml$-trees, both extending the
+parameter-free grammar $S \to 1 \mid x \mid \eml(S,S)$ of
+\cite{odrzywolek2026} with continuous parameters that make gradient-based
+optimisation tractable. The first (EM) keeps the paper's parameter-free
+$\eml$ operator and adds continuous affine \emph{wrappers} between nodes;
+the second (PEM) absorbs parameters \emph{into} the operator itself and is
+"$\eml$ all the way down."
 
-Let $D = \dim x$. An \emph{EML-tree} of depth $d$ is a complete binary tree of
-$\eml$ nodes; every node $n$ has two input slots $(\ell_n, r_n)$, each of which
-is a continuous affine combination of (i) the input vector, (ii) the
-corresponding child subtree's output (when present), and (iii) a bias:
+\subsection{Architecture A: affine-glue (EM)}
+\label{sec:cae:em}
+
+Let $D = \dim x$. An \emph{EM-tree} of depth $d$ is a complete binary tree
+of parameter-free $\eml$ nodes; every node $n$ has two input slots
+$(\ell_n, r_n)$, each of which is a continuous affine combination of (i) the
+input vector, (ii) the corresponding child subtree's output (when present),
+and (iii) a bias:
 \begin{equation}
 \text{slot}_n^{\bullet} = \sum_{i=1}^{D} a_{n,i}^{\bullet} x_i
-                          + b_n^{\bullet}\, c_n^{\bullet}
+                          + b_n^{\bullet}\, \text{child}_n^{\bullet}
                           + c_n^{\bullet}, \qquad \bullet \in \{\ell, r\},
 \label{eq:slot}
 \end{equation}
-where $c_n^{\bullet}$ is the corresponding child output. Leaf-parent slots
-omit the child term. The tree value is the root output:
-\[
-T_\theta(x) = \eml(\text{slot}_{\text{root}}^{\ell}, \text{slot}_{\text{root}}^{r}).
-\]
+where $\text{child}_n^{\bullet}$ is the corresponding child eml output.
+Leaf-parent slots omit the child term. The node value is
+$\eml(\text{slot}_n^{\ell}, \text{slot}_n^{r}) = \exp(\text{slot}_n^{\ell})
+- \ln(\text{slot}_n^{r})$, and the tree value is the root node's output.
 At depth $d$, with input dimension $D$, the parameter count is
 \[
-\#\theta(d, D) = 2 \cdot \!\!\sum_{\text{level}=0}^{d-1}\! 2^{\text{level}}
+\#\theta_{\rm EM}(d, D) = 2 \cdot \!\!\sum_{\text{level}=0}^{d-1}\! 2^{\text{level}}
   \cdot \!\big(D + 1 + \mathbf{1}[\text{level} < d-1]\big).
 \]
 For $D = 1$: $4, 14, 34, 74, 154, 314$ params at depths $1\ldots 6$.
+\textbf{Caveat.} EM is not strictly an $\eml$-tree: every internal slot is
+wrapped in an affine layer, so the architecture is "$\eml$ interleaved with
+affine layers." This is a deliberate, more expressive relaxation; it is
+easier to optimise than the discrete grammar but does not directly probe
+the paper's universality claim. PEM (next) repairs this.
+
+\subsection{Architecture B: per-node parametric (PEM), eml-all-the-way-down}
+\label{sec:cae:pem}
+
+A \emph{PEM-tree} of depth $d$ is a complete binary tree of $2^d - 1$
+internal nodes. Each node $i$ carries six free parameters
+$\theta_i = (a_i, b_i, c_i, d_i, e_i, f_i)$ and computes
+\begin{equation}
+\mathrm{EML}_{\theta_i}(x, y) \;=\; a_i\, e^{b_i x + c_i} \;+\; d_i\,
+  \ln(e_i y + f_i),
+\label{eq:pem}
+\end{equation}
+where $x, y$ are the \emph{raw} eml outputs of the two children — there is
+no affine wrapper between nodes. The paper's parameter-free
+$\eml(x,y) = \exp(x) - \ln(y)$ is the special case
+$\theta = (1, 1, 0, -1, 1, 0)$, so PEM strictly contains the paper's
+grammar at every node. At leaf-parents (the deepest level), $x$ and $y$
+are the input variable directly; for multivariate input, $b_i$ and $e_i$
+are $D$-dim vectors so that $b_i \cdot x + c_i$ and $e_i \cdot x + f_i$
+remain scalars. At all higher levels children are scalars and $b_i, e_i$
+are scalars too. The parameter count for $D = 1$ is
+\[
+\#\theta_{\rm PEM}(d) = 6 \cdot (2^d - 1) = 6, 18, 42, 90, 186, 378
+\quad \text{at depths $1\ldots 6$.}
+\]
+
+The two architectures occupy different points on the
+parameter-efficiency-vs-expressivity Pareto frontier. EM has fewer
+parameters per node (each node is parameter-free; expressivity comes
+through the affine wrappers); PEM has more parameters per node (each node
+is an asymmetric exp+log primitive with independent affine inputs to each
+arm). Section~\ref{sec:pem} compares them empirically across $11$ canonical
+$1$D targets.
 
 \subsection{Numerical evaluation}
 
@@ -233,6 +284,7 @@ times reported on a single Apple M-series CPU, no GPU.
 \section{Results}
 
 \subsection{Depth scaling, fixed-restart Adam (1D)}
+\label{sec:depth-scaling}
 
 Table~\ref{tab:1d} reports best-of-$12$-restarts relRMSE and per-restart
 success rate (relRMSE $< 5\%$) at depths $1$--$4$ with $K = 3000$ Adam steps.
@@ -275,6 +327,7 @@ failure.}
 \end{figure}
 
 \subsection{Optimisation landscape}
+\label{sec:landscape}
 
 Across $50$ random seeds, we measure the fraction of restarts reaching
 quality thresholds. Table~\ref{tab:landscape} shows that depth-$4$ trees have
@@ -648,34 +701,21 @@ CC (P = $68, 148, 308, 628$) & 0.070 & 0.056 & 0.044 & 0.046 \\
 \end{tabular}
 \end{table}
 
-\subsection{Per-node parametric formulation: eml all the way down}
+\subsection{PEM vs.\ EM head-to-head}
 \label{sec:pem}
 
-A reviewer correctly observed that the architecture used in
-Sections~\ref{sec:cae}--\ref{sec:rip-push}, while productive empirically, is
-\emph{not} a pure $\eml$-tree. Each internal slot carries an affine wrapper
-$a x + b\,\text{child} + c$ before the parameter-free $\eml$. This is "$\eml$
-interleaved with affine layers," not "$\eml$ all the way down."
+The PEM architecture (per-node parameters, eml-all-the-way-down) introduced
+in Section~\ref{sec:cae:pem} is the natural pure-$\eml$ counterpart to the
+affine-glue EM architecture used in Sections~\ref{sec:depth-scaling}--%
+\ref{sec:rip-push}. We now run both architectures head-to-head under
+identical conditions: strategy B, $25\,$s/cell, $11$ canonical $1$D
+targets at depths $2$--$5$.
 
-We therefore introduce a second architecture in which parameters are absorbed
-\emph{into} the $\eml$ operator itself. Each node $i$ computes
-\begin{equation}
-\mathrm{EML}_{\theta_i}(x, y) \;=\; a_i\, e^{b_i x + c_i} \;+\; d_i\,
-  \ln(e_i y + f_i),
-\label{eq:pem}
-\end{equation}
-with $\theta_i = (a_i, b_i, c_i, d_i, e_i, f_i)$. Children $x, y$ are fed
-\emph{raw} (no affine wrapper). At the deepest level, $x$ and $y$ are the
-input variable directly; for multivariate input, $b_i, e_i \in \mathbb{R}^D$
-at the leaf-parent level only. The paper's parameter-free $\eml$ is the
-special case $\theta = (1, 1, 0, -1, 1, 0)$. We refer to this as PEM (parametric
-$\eml$); the affine-glue version of Section~\ref{sec:cae} is denoted EM.
-
-\paragraph{Parameter count comparison.}
-PEM has $6 \cdot (2^d - 1)$ parameters at depth $d$ for univariate input;
-$18, 42, 90, 186$ at depths $2, 3, 4, 5$. EM has $14, 34, 74, 154$. PEM is
-slightly more parameters per depth, but each parameter has a clean meaning
-in the operator's algebra (sign and scale of each arm; affine slope and
+\paragraph{Parameter counts.}
+EM: $14, 34, 74, 154$ at depths $2, 3, 4, 5$. PEM: $18, 42, 90, 186$. PEM
+has slightly more parameters per depth, but each parameter has a clean
+meaning in the operator's algebra (sign and scale of each arm; affine
+slope and
 intercept inside each arm).
 
 \begin{table}[h]
@@ -772,162 +812,6 @@ tool for shape-rich targets at shallow depth, where per-node expressivity
 matters more than tree breadth. \emph{Both} are practical realisations of
 the universality theorem, with different parameter-efficiency profiles on
 different target classes.
-
-\paragraph{The rip wall is not a wall.}
-Real-parameter trees with the \texttt{real\_softplus} backend reach
-$0.58\%$ relRMSE on $\sin(3x)\,e^{-x^2/2}$ at depth $6$ given enough
-restarts. The earlier $2\%$ plateau was a budget effect, not a structural
-limit. Real-param trees \emph{are} practically universal at sufficient depth.
-
-\paragraph{Why does CC plateau?}
-At $60\,$s, CC reaches only $\sim 4.5\%$ at $d{=}5$--$6$ and does not improve
-further. We attribute this to the anneal $0 \to 0.1$ schedule used here:
-forcing $|\mathrm{Im}\,T_\theta| \to 0$ at training-end undoes the very
-mechanism (large imaginary intermediates) by which CC builds oscillation
-cheaply. The right schedule for an oscillatory target is most likely a
-\emph{lower} terminal $\lambda$ (e.g.\ $10^{-3}$) — i.e., S1 of
-Section~\ref{sec:anneal}, which reached $3.3\%$ at $25\,$s — possibly with
-two-stage training (no penalty until convergence, then a final clean-up
-sweep). We did not run the matched $60\,$s replication of S1 or this
-two-stage variant; this is a short follow-up.
-
-\subsection{Imaginary-part penalty schedule}
-\label{sec:anneal}
-
-Section~\ref{sec:complex-params} used a constant $\lambda_{\mathrm{im}} =
-10^{-3}$ on the auxiliary loss
-$\lambda_{\mathrm{im}} \cdot \overline{|\mathrm{Im}\,T_\theta|^2}$.
-The CC analysis revealed two opposing demands: oscillatory targets benefit
-from a large imaginary magnitude ($\overline{|\mathrm{Im}\,T_\theta|}
-\sim 1$--$2$), while non-oscillatory targets degrade as the imaginary part
-drifts. We test whether a $\lambda_{\mathrm{im}}$ \emph{schedule} resolves
-this tension: start with no penalty (let oscillation form), then ramp up
-to a strong penalty (clean up Im at the end). Four schedules are compared
-at strategy B, $25\,$s/cell, on five targets across $d \in \{3,4,5\}$:
-\begin{itemize}
-\item S0: $\lambda = 0$ throughout.
-\item S1: $\lambda = 10^{-3}$ throughout (the prior CC default).
-\item S2: cosine ramp $\lambda: 0 \to 10^{-1}$.
-\item S3: cosine ramp $\lambda: 0 \to 1.0$ (aggressive).
-\end{itemize}
-
-\begin{table}[h]
-\centering\small
-\caption{Best relRMSE per (target, depth, schedule). Bold marks per-row
-winner; \texttt{im\_mag} reported for the winning model.}
-\label{tab:anneal}
-\begin{tabular}{llrrrrr}
-\toprule
-target & depth & S0 ($\lambda{=}0$) & S1 ($10^{-3}$) & S2 ($\to 10^{-1}$) & S3 ($\to 1$) & im\_mag (best) \\
-\midrule
-rip       & 3 & \textbf{2.3e-2} & 4.8e-2 & 7.5e-2 & 6.7e-2 & 2.10 \\
-rip       & 4 & 4.4e-2 & \textbf{3.3e-2} & 7.8e-2 & 5.8e-2 & 1.55 \\
-rip       & 5 & 5.3e-2 & \textbf{3.3e-2} & 7.0e-2 & 3.8e-2 & 0.65 \\
-\addlinespace
-osc       & 3 & \textbf{4.4e-2} & 4.5e-2 & 1.1e-1 & 4.5e-2 & 1.51 \\
-osc       & 4 & 5.2e-2 & \textbf{3.7e-2} & 7.4e-2 & 5.7e-2 & 1.62 \\
-osc       & 5 & 6.8e-2 & \textbf{4.0e-2} & 7.9e-2 & 1.1e-1 & 1.80 \\
-\addlinespace
-$\sin x$  & 3 & \textbf{1.8e-3} & 7.2e-3 & 4.6e-3 & 3.1e-3 & 2.01 \\
-$\sin x$  & 4 & \textbf{1.6e-3} & 9.9e-3 & 4.5e-3 & 4.3e-3 & 2.13 \\
-$\sin x$  & 5 & \textbf{7.1e-3} & 1.7e-2 & 1.7e-2 & 1.2e-2 & 1.91 \\
-\addlinespace
-$x^2$     & 3 & 3.2e-3 & \textbf{1.7e-3} & 1.9e-3 & 5.1e-3 & 0.05 \\
-$x^2$     & 4 & 5.6e-3 & 4.5e-3 & \textbf{1.4e-3} & 3.6e-3 & 5.6e-3 \\
-$x^2$     & 5 & \textbf{1.6e-3} & 4.2e-3 & 6.1e-3 & 1.1e-2 & 1.59 \\
-\addlinespace
-$e^{-x}$  & 3 & 2.4e-3 & 2.6e-3 & 3.4e-3 & \textbf{2.1e-3} & 3.6e-4 \\
-$e^{-x}$  & 4 & 1.0e-3 & 4.3e-3 & \textbf{5.7e-4} & 2.4e-3 & 6.4e-4 \\
-$e^{-x}$  & 5 & \textbf{5.5e-3} & 1.3e-2 & 1.7e-2 & 1.9e-2 & 0.66 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{Reading.}
-The schedule story is target-class-dependent:
-\begin{itemize}
-\item For oscillatory targets, \textbf{S0 ($\lambda = 0$) is the best CC
-  default}, beating the prior S1 (constant $10^{-3}$) on every (target,
-  depth) entry where it wins. The model uses Im freely
-  ($\overline{|\mathrm{Im}\,T_\theta|} \sim 1.5$--$2.1$) to construct
-  oscillation; any penalty hurts.
-\item For non-oscillatory targets, the picture is mixed. S2 beats every
-  other schedule for $e^{-x}$ at $d{=}4$ ($5.7 \times 10^{-4}$), and for
-  $x^2$ at $d{=}4$ ($1.4 \times 10^{-3}$). At these cells, S2 \emph{also
-  beats R real-soft} (which gave $2.0 \times 10^{-3}$ for $e^{-x}$ at
-  $d{=}4$): annealing the Im penalty produces a tree that uses complex
-  intermediates as scratch space early in optimisation, then collapses
-  to a near-real solution by the end ($\overline{|\mathrm{Im}\,T_\theta|}
-  \sim 6 \times 10^{-4}$).
-\item S3 (aggressive, $\to 1$) is rarely best; it kills oscillation too
-  hard.
-\end{itemize}
-
-\paragraph{Headline correction to Section~\ref{sec:complex-params}.}
-The earlier conclusion that ``CC hurts non-oscillatory targets'' was an
-artefact of the constant-$10^{-3}$ default. With a properly chosen
-schedule (S2: anneal $0 \to 10^{-1}$), CC \emph{wins} on $e^{-x}$ at
-$d{=}4$ and $x^2$ at $d{=}4$. The complex parameters are useful as
-search-time scratch space even when the target itself is real-valued
-and non-oscillatory.
-
-\subsection{Pushing the rip wall: large budget at high depth}
-\label{sec:rip-push}
-
-We now push the most-resistant target. We rerun rip at depths $3$--$6$
-with the budget extended to $60\,$s/cell, comparing R (real-soft, real
-params) against CC (anneal $0 \to 10^{-1}$, complex params).
-
-\begin{table}[h]
-\centering\small
-\caption{Rip target at extended $60\,$s budget per cell.}
-\label{tab:rip-push}
-\begin{tabular}{lrrrrr}
-\toprule
-setting & $d{=}3$ & $d{=}4$ & $d{=}5$ & $d{=}6$ & params at $d{=}6$ \\
-\midrule
-R (real, real-soft) & 9.5e-2 & 1.1e-2 & 2.2e-2 & \textbf{5.8e-3} & 314 \\
-CC (complex, anneal) & 7.0e-2 & 5.6e-2 & 4.4e-2 & 4.6e-2 & 628 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\paragraph{The wall breaks.}
-With $60\,$s of strategy-B Adam$+$LBFGS at depth $6$, real-parameter
-$\eml$-trees reach $\mathbf{0.58\%}$ relRMSE on $\sin(3x)\,e^{-x^2/2}$.
-This decisively retracts the ``rip stays $\geq 2\%$'' claim of
-Section~\ref{sec:universality}: that bound was a function of compute
-budget, not of expressivity. Real-parameter trees \emph{can} fake
-oscillation through subtractive interference of high-magnitude
-exponentials, given depth and time.
-
-\paragraph{Why CC plateaus.}
-Despite double the parameters at every depth, CC plateaus at $\sim 4$--$5\%$
-on rip and never matches R d=6. Two reasons. First, CC has only $\sim$half
-as many restarts as R at the same wall-clock (more parameters $\Rightarrow$
-slower iterations). Second, the anneal-to-$10^{-1}$ schedule that wins on
-non-oscillatory targets actively suppresses the very Im magnitude that CC
-needs to express oscillation; on rip, S0 ($\lambda{=}0$) is the better
-schedule (Section~\ref{sec:anneal}). With S0 and a $60\,$s budget the
-expected CC d=4 is around $2.5$--$3\%$ (extrapolating from the 25-s
-table) --- still worse than R d=6.
-
-\paragraph{Implication for practical universality.}
-The combination of (i) continuous-affine parameterisation, (ii) Adam +
-LBFGS strategy, (iii) sufficient depth, and (iv) sufficient budget
-realises practical universality of $\eml$-trees on every target in our
-1D suite to $\leq 1\%$ relRMSE. Complex parameters help shallow-depth
-fitting of oscillatory targets but are not required for the asymptotic
-result. The headline of the paper now stands without the rip caveat.
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.95\linewidth]{../figures/fits_anneal.png}
-\caption{$\lambda_{\mathrm{im}}$ schedule comparison. S0 ($\lambda = 0$,
-grey) wins on oscillatory targets; S2 (anneal $0 \to 10^{-1}$, green) wins
-on non-oscillatory targets at the right depth.}
-\label{fig:anneal}
-\end{figure}
 
 \subsection{Symbol snapping and interpretability}
 \label{sec:snap-results}
