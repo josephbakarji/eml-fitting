@@ -28,3 +28,14 @@ paper/*.fdb_latexmk
 paper/*.synctex.gz
 paper/*.bbl
 paper/*.blg
+
+# NeurIPS paper LaTeX build artefacts
+paper/NeurIPS_2026___EML/*.aux
+paper/NeurIPS_2026___EML/*.log
+paper/NeurIPS_2026___EML/*.out
+paper/NeurIPS_2026___EML/*.bbl
+paper/NeurIPS_2026___EML/*.blg
+paper/NeurIPS_2026___EML/*.toc
+paper/NeurIPS_2026___EML/*.fls
+paper/NeurIPS_2026___EML/*.fdb_latexmk
+paper/NeurIPS_2026___EML/*.synctex.gz

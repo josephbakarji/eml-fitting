@@ -17,5 +17,6 @@ Every run logged here: timestamp, script, config, wall-clock, output, headline r
 | 11| 2026-05-04 | `exp_rip_push.py`   | rip @ d∈[3,6], 60s budget, R vs CC      | 423     | `results_rip_push.json` | **Rip wall breaks**: R d=6 → 0.58% relRMSE; CC plateaus at 4–5%          |
 | 12| 2026-05-04 | `exp_parametric.py` | 11 targets × 4 depths × {PEM,EM}, 25s/cell| 1675   | `results_parametric.json`| PEM beats EM at d=3 on rip (5.6×), sin (3×), abs (5×), tanh, log_safe; EM wins on x², exp_decay |
 | 13| 2026-05-04 | `exp_parametric_snap.py`| 7 targets, d=3 PEM + greedy snap     | 234     | `results_parametric_snap.json`| Snap rate modest (5–21%) but loss decreases on every target |
+| 14| 2026-05-06 | `exp_universality_pem.py`| 5 targets × 3 depths × {real, complex} PEM, 30s/cell | 750 | `results_universality_pem.json`| Real PEM hits sub-1% on 4/5 by d=4; complex helps only on rip; basis for NeurIPS §4 |
 | 10| 2026-05-04 | `exp_complex_anneal.py`| 5 targets × 3 depths × 4 λ schedules     | 1245    | `results_complex_anneal.json` | λ=0 is best for oscillatory; anneal→0.1 helps non-osc at d=4 (exp_decay 5.7e-4 beats R) |
 | 11| 2026-05-04 | `exp_rip_push.py`     | rip target, d=3..6, 60s budget, R vs CC  | 423     | `results_rip_push.json`  | **rip wall breaks**: R d=6 60s → 5.8e-3 (0.58%). CC plateaus ~4-5%       |

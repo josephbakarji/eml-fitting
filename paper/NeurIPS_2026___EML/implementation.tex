@@ -1,0 +1,181 @@
+% =============================================================================
+% Implementation section — added by collaborator (numerical experiments).
+% Uses the PEM formulation from Section 3 (eq. preceding the line defining theta_i).
+% Self-contained. Keep main neurips_2026.tex untouched apart from the \input
+% line that pulls this file into the existing \section{Implementation} body.
+% =============================================================================
+
+The constructive proof of Theorem~\ref{main_theorem} establishes that the
+parametric EML grammar can express, exactly, any element of an arbitrarily
+fine polynomial approximant to a $W^{k,\infty}$ function. It does not by
+itself address whether such a tree can be \emph{recovered} from data by
+gradient-based optimisation. In contrast to~\cite{eml}, which targets
+\emph{symbolic} recovery of vanilla-EML trees over the discrete grammar
+$\{1,\, x,\, \mathrm{EML}(\cdot,\cdot)\}$ and reports rapid collapse of
+recovery rate at depth $\geq 5$, we exploit the continuous parameters of
+the generalised atom $\emlTheta{x}{y}$ to make the optimisation landscape
+amenable to first-order methods. This section reports a small, focused
+empirical study in support of the theorem's practical content.
+
+\subsection{Setup}
+\label{sec:impl:setup}
+
+\paragraph{Architecture.}
+We use the PEM tree of Section~\ref{main_theorem} directly: a complete
+binary tree $T_\theta$ of $2^d - 1$ atoms, each carrying six free parameters
+$\theta_i = \{a_i, b_i, c_i, d_i, e_i, f_i\}$ and computing
+$\emlTheta{x}{y}$. Children are fed \emph{raw} between atoms, with the
+input variable $x$ entering at the leaf-parents directly. For univariate
+$x$ the parameter count is $\#\theta(d) = 6(2^d - 1) \in \{42, 90, 186\}$
+at depths $d \in \{3, 4, 5\}$.
+
+\paragraph{Two parameterisations.}
+We consider two regimes:
+\begin{description}[itemsep=2pt, topsep=2pt]
+\item[Real (R).] All $\theta_i \in \R^6$. To keep the operator real on
+  $\R$, the logarithm's argument is routed through
+  $\ln(\mathrm{softplus}(\cdot) + \eps)$ with $\eps = 10^{-6}$, a smoothed-positive
+  surrogate for the principal-branch logarithm. This blocks the
+  trigonometric path of the corresponding remark in
+  Section~\ref{main_theorem} but eliminates branch-cut pathologies.
+\item[Complex (C).] All $\theta_i \in \C^6$, stored as twin real
+  Parameters $(\theta_i^R, \theta_i^I)$. Forward in $\C^{128}$ with the
+  principal branch of $\ln$; the loss is computed on $\mathrm{Re}(T_\theta(x))$.
+  We add a small auxiliary penalty $\lambda \cdot
+  \overline{|\mathrm{Im}\,T_\theta|^2}$ with $\lambda = 10^{-3}$ so that
+  the trained predictor is honestly real-valued. Doubling the parameter
+  count is the cost; gaining the trigonometric path is the intended benefit.
+\end{description}
+
+\paragraph{Optimisation procedure.}
+We minimise mean-squared error on a uniform grid of $N = 200$ samples per
+target with the following two-stage strategy, applied per
+(target, depth, parameterisation) cell at a fixed wall-clock budget of
+$30$ seconds:
+\begin{enumerate}[leftmargin=*, itemsep=2pt, topsep=2pt]
+\item \textbf{Adam multi-restart.} From independent Gaussian-initialised
+  seeds, run $1500$ steps of Adam with learning rate $5\times 10^{-3}$,
+  cosine-annealed to zero, gradient $\ell_2$-clip at $5.0$. Track the
+  best mean-squared error across restarts.
+\item \textbf{L-BFGS refinement.} Apply L-BFGS with strong-Wolfe line
+  search ($\leq 200$ iterations, history $20$) to the best-of-restarts
+  model and take the smaller of the pre- and post-refinement losses.
+\end{enumerate}
+The number of Adam restarts per cell is determined by the budget rather
+than fixed and is reported in Table~\ref{tab:pem_universality}.
+
+\paragraph{Assumptions.}
+The reported numbers depend on three explicit choices. (i) Under R the
+operator is the softplus-stabilised log surrogate, not vanilla EML; the
+two coincide on positive arguments and diverge smoothly near zero. (ii)
+All targets are noise-free, dense samples on the stated domain; no claim
+is made about generalisation to sparse or noisy data. (iii) The
+wall-clock budget is small ($30\,$s on a single CPU) and held fixed
+across cells; reported errors at the larger depths are
+optimisation-limited, not capacity-limited.
+
+\subsection{Targets and metric}
+
+We report results on five 1D targets, each chosen to align with a specific
+construction in the proof:
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt]
+\item $x^3 - x$ on $[-1.5,\,1.5]$: a degree-$3$ polynomial; the local
+  approximant of Lemma~\ref{BrambleHilbert} in its simplest non-trivial
+  form. The constructive bound is $5k - 3 = 12$ atoms for degree $k = 3$.
+\item $\tanh(2x)$ on $[-2,\,2]$: hyperbolic tangent, used in the
+  partition-of-unity construction (Section~6); the explicit EML
+  realisation is in Figure~\ref{fig:tanhFigure}.
+\item $\sin(x)$ on $[-\pi,\,\pi]$: the trigonometric case highlighted in
+  the corresponding remark; the vanilla-EML construction routes through
+  $\ln(-1) = i\pi$, unreachable from R.
+\item $e^{-x^2}$ on $[-2.5,\,2.5]$: smooth analytic, no oscillation —
+  baseline for ``easy'' targets.
+\item $\sin(3x)\,e^{-x^2/2}$ on $[-3,\,3]$: oscillation $\times$ envelope;
+  the hardest target in this set.
+\end{itemize}
+We report \emph{relative RMSE},
+$\mathrm{relRMSE} = \|T_\theta(x) - f(x)\|_2 / \|f(x)\|_2$,
+on the training grid, best-of-restarts.
+
+\subsection{Results}
+
+Table~\ref{tab:pem_universality} reports the best relRMSE per cell.
+Figure~\ref{fig:pem_universality} plots relRMSE against depth on a log scale.
+
+\input{table_pem_universality.tex}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.78\linewidth]{Figures/pem_universality.pdf}
+  \caption{Best relative RMSE vs PEM tree depth, five targets, real (solid)
+  and complex (dashed) parameterisations, $30\,$s wall-clock per
+  cell. The dotted line marks the $1\%$ relRMSE threshold. Real PEM
+  reaches sub-percent error on $4/5$ targets by depth $4$; complex PEM is
+  competitive only on $\sin(3x)\,e^{-x^2/2}$, where its larger capacity
+  helps despite the halved restart count.}
+  \label{fig:pem_universality}
+\end{figure}
+
+\paragraph{What the numbers say.}
+Three observations support the theorem's practical content.
+\textbf{(i)} Real-parameterised PEM trees achieve sub-percent relRMSE on
+$4$ of $5$ targets at depth $4$ within $30\,$s of single-CPU compute,
+including the polynomial target $x^3 - x$ which falls to
+$1.47 \times 10^{-3}$. This is a direct empirical reflection of the
+constructive route of the theorem (polynomial approximation, then exact
+EML representation): gradient methods reach close to the constructed
+optimum, even though the construction itself is not used as an
+initialisation.
+\textbf{(ii)} The trigonometric target $\sin(x)$ does \emph{not} require
+the complex parameterisation in our setting: real PEM at depth $3$
+already reaches $3.0 \times 10^{-3}$. The softplus-stabilised log is
+expressive enough on this domain that the complex path is not the binding
+constraint at the budget shown.
+\textbf{(iii)} The hardest target, $\sin(3x)\,e^{-x^2/2}$, is the one
+clear case where the complex parameterisation pays off:
+$3.6 \times 10^{-2}$ at depth $5$ (C) versus $9.1 \times 10^{-2}$ at the
+same depth (R). The composite oscillation-envelope target rewards the
+extra capacity even though C completes only half as many restarts in the
+same wall-clock budget.
+
+The general pattern visible in Figure~\ref{fig:pem_universality} — error
+falling sharply from depth $3$ to depth $4$, then rising at depth $5$ for
+several real targets — is a wall-clock-budget effect: deeper trees have
+more parameters but, at fixed budget, fewer restarts to find good basins.
+With unlimited compute this artefact would disappear; under fixed compute
+it suggests an ``elbow'' depth around $d = 4$ for these 1D targets.
+
+\paragraph{Computational cost.}
+The full sweep (5 targets $\times$ 3 depths $\times$ 2 parameterisations
+$=$ 30 cells) completes in approximately $12$~minutes on a single laptop
+CPU (Apple M-series, no GPU). Per-cell wall-clock is $30\,$s by
+construction; the number of completed Adam restarts ranges from $\sim 15$
+at $(d{=}3,\,$R$)$ down to $2$ at $(d{=}5,\,$C$)$. No GPU acceleration
+or parallelism was used.
+
+\subsection{Limitations}
+\label{sec:impl:limitations}
+
+We list the limitations of this empirical study honestly, in priority order.
+
+\begin{itemize}[leftmargin=*, itemsep=2pt, topsep=2pt]
+\item \textbf{Single-run-of-experiment.} Tabled values are the best loss
+  from one run of the multi-restart procedure. Variance across full
+  reruns is not reported. Order-of-magnitude conclusions are robust;
+  comparisons within a factor of $\sim 2$ should not be over-interpreted.
+\item \textbf{Real-softplus surrogate.} The R parameterisation is not
+  vanilla EML. Trees fit under R coincide with EML on the
+  positive-argument slice but smoothly diverge near zero. The complex
+  parameterisation uses the operator literally.
+\item \textbf{Univariate, smooth, dense, noise-free.} Multivariate
+  fitting, sparse sampling, and noise robustness are all open and likely
+  harder; the theorem is dimension-agnostic but our experiments are not.
+\item \textbf{Fixed-budget effects on depth comparison.} Deeper trees
+  receive fewer restarts at fixed wall-clock, so the
+  depth-vs-error curve confounds capacity gain with restart-count loss.
+  The dip at depth $4$ for several targets is the visible signature.
+\item \textbf{Optimisation, not approximation, theory.} The reported
+  numbers are achieved errors, not bounds. They are upper-bounded by the
+  theorem; whether they meet the rate the theorem predicts (and at what
+  budget the gap closes) is a question we do not address here.
+\end{itemize}

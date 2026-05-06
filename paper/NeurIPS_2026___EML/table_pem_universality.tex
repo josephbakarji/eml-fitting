@@ -1,0 +1,25 @@
+\begin{table}[t]
+  \centering
+  \caption{Best relative RMSE per cell, PEM trees with real (R) and complex (C)
+  parameters at depths $3, 4, 5$. Strategy: Adam multi-restart $+$ L-BFGS,
+  $30\,$s wall-clock per cell. Parenthesised integer is the number of
+  completed Adam restarts within the budget; parameter count is
+  $\#\theta = 6\,(2^d - 1)$ for R and twice that for C. Bolded entry per row
+  is the best of the six.}
+  \label{tab:pem_universality}
+  \small
+  \setlength{\tabcolsep}{3.5pt}
+  \begin{tabular}{l|ccc|ccc}
+    \toprule
+    & \multicolumn{3}{c|}{\textbf{Real (R)}, $\#\theta = 42, 90, 186$}
+    & \multicolumn{3}{c}{\textbf{Complex (C)}, $\#\theta = 84, 180, 372$} \\
+    \textbf{Target} & $d{=}3$ & $d{=}4$ & $d{=}5$ & $d{=}3$ & $d{=}4$ & $d{=}5$ \\
+    \midrule
+    $x^3 - x$ & $7.58\!\cdot\!10^{-3}$ \scriptsize(15) & $\mathbf{1.47\!\cdot\!10^{-3}}$ \scriptsize(8) & $4.32\!\cdot\!10^{-3}$ \scriptsize(4) & $2.17\!\cdot\!10^{-2}$ \scriptsize(7) & $1.37\!\cdot\!10^{-2}$ \scriptsize(4) & $5.20\!\cdot\!10^{-2}$ \scriptsize(2) \\
+    $\tanh(2x)$ & $4.20\!\cdot\!10^{-3}$ \scriptsize(15) & $\mathbf{1.22\!\cdot\!10^{-3}}$ \scriptsize(8) & $2.10\!\cdot\!10^{-3}$ \scriptsize(4) & $1.77\!\cdot\!10^{-3}$ \scriptsize(7) & $5.16\!\cdot\!10^{-3}$ \scriptsize(4) & $1.80\!\cdot\!10^{-2}$ \scriptsize(2) \\
+    $\sin(x)$ & $\mathbf{3.02\!\cdot\!10^{-3}}$ \scriptsize(15) & $7.67\!\cdot\!10^{-3}$ \scriptsize(8) & $1.01\!\cdot\!10^{-2}$ \scriptsize(4) & $1.74\!\cdot\!10^{-2}$ \scriptsize(7) & $3.49\!\cdot\!10^{-3}$ \scriptsize(4) & $2.07\!\cdot\!10^{-2}$ \scriptsize(2) \\
+    $e^{-x^2}$ & $4.13\!\cdot\!10^{-3}$ \scriptsize(15) & $\mathbf{1.12\!\cdot\!10^{-3}}$ \scriptsize(7) & $4.66\!\cdot\!10^{-3}$ \scriptsize(4) & $2.20\!\cdot\!10^{-2}$ \scriptsize(7) & $5.27\!\cdot\!10^{-3}$ \scriptsize(3) & $1.27\!\cdot\!10^{-2}$ \scriptsize(2) \\
+    $\sin(3x)\,e^{-x^2/2}$ & $\mathbf{3.23\!\cdot\!10^{-2}}$ \scriptsize(15) & $9.80\!\cdot\!10^{-2}$ \scriptsize(7) & $9.09\!\cdot\!10^{-2}$ \scriptsize(4) & $6.45\!\cdot\!10^{-2}$ \scriptsize(6) & $3.91\!\cdot\!10^{-2}$ \scriptsize(3) & $3.57\!\cdot\!10^{-2}$ \scriptsize(2) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
