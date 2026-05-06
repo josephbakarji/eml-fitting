@@ -178,4 +178,16 @@ We list the limitations of this empirical study honestly, in priority order.
   numbers are achieved errors, not bounds. They are upper-bounded by the
   theorem; whether they meet the rate the theorem predicts (and at what
   budget the gap closes) is a question we do not address here.
+\item \textbf{Function-level fits, not symbolic recoveries.} Decoding
+  the fitted depth-$3$ trees and greedy-snapping each parameter to the
+  nearest of $\{-2, -1, 0, 1, 2\}$ at $30\%$ relative-loss tolerance, we
+  recover at most $7/42$ ($17\%$) parameters as discrete on any target,
+  and zero atoms become fully discrete. On $\tanh(2x)$ and $e^{-x^2}$
+  exactly $0$ parameters are snappable. The optimiser exploits the
+  $\R^6$ freedom of each atom to land in a continuous-coefficient basin
+  whose function value matches the target but whose parameters bear no
+  resemblance to the constructive symbolic blocks of Sections~5--6.
+  Recovering interpretable trees would require a structural regulariser
+  (sparsity-toward-$\{0,\pm1\}$, or warm-start from the construction);
+  this is left for future work.
 \end{itemize}
